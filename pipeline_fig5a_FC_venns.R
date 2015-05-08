@@ -46,9 +46,9 @@ get_uniqSets = function(a = 1, b = 2, min_foldChange = 4, me3_factor = 1){
 
 pdf(paste('Figure_5a_FC_venns_JB-',date2fname(),'.pdf', sep = ''))
 #pdf(paste('output_pw/Figure_5a_venns_JB-',date2fname(),'.pdf', sep = ''))
-uniq_10a_v_7 = get_uniqSets(1, 2)
-uniq_10a_v_231 = get_uniqSets(1, 3)
-uniq_7_v_231 = get_uniqSets(2, 3)
+uniq_10a_v_7 = get_uniqSets(1, 2, min_foldChange = 2^detect_thresh)
+uniq_10a_v_231 = get_uniqSets(1, 3, min_foldChange = 2^detect_thresh)
+uniq_7_v_231 = get_uniqSets(2, 3, min_foldChange = 2^detect_thresh)
 dev.off()
 
 save(uniq_10a_v_7, uniq_10a_v_231, uniq_7_v_231, file = 'pw_uniquely.save')

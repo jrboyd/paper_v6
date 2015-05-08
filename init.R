@@ -32,6 +32,7 @@ if(!file.exists('my_fe_corrected.save')){
 
 
 my_fe = my_fe[,c(4:6,1:3)]
-
+detect_thresh = 2 #this threshold is used repeatedly for FE/FC thresholding
+gsea_sig_thresh = 9 #-log10 pvalue threshold for gsea testing
 primeColors = rep(RColorBrewer::brewer.pal(n = 3, 'Dark2'),2)
 

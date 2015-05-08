@@ -4,7 +4,7 @@ if(exists('parent_dir')){
   source('init.R')
 figGen = T
 markData_4me3_4ac = my_fe
-isMarked = markData_4me3_4ac > 2
+isMarked = markData_4me3_4ac > detect_thresh
 # enst_isMarked = markData_4me3_4ac > 1
 # uniq_ensg = unique(enst2ensg)
 # ensg_isMarked = 

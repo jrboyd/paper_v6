@@ -3,8 +3,12 @@
 
 if(exists('parent_dir')){
   source(in_parent_dir('init.R'))
-}else
+}else if(file.exists('init.R')){
   source('init.R')
+}else{
+  setwd('..')
+  source('init.R')
+}
 
 ensgs = enst_dict$ensg_id
 chrms = enst_dict$chrms

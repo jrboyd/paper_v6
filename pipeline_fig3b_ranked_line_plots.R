@@ -5,6 +5,9 @@ if(exists('parent_dir')){
 }else
   source('init.R')
 
+keep = apply(my_fe, 1, max) > detect_thresh
+my_fe = my_fe[keep,]
+
 lines = c('MCF10A', 'MCF7', 'MDA231')
 mods = c('H3K4ME3', 'H3K4AC')
 other_mod = function(m){
@@ -78,7 +81,7 @@ par(mai = c(.4,.5,.1,.1))
 for(l in lines){
   ac_dat = my_fe[, paste(l,'H3K4AC')]
   me_dat = my_fe[, paste(l,'H3K4ME3')]
-  
+  q_thresh = .75
   me_thresh = quantile(me_dat, q_thresh)
   keep = me_dat > me_thresh
   ac_dat = ac_dat[keep]
@@ -91,7 +94,7 @@ for(l in lines){
   ac_dat = my_fe[, paste(l,'H3K4AC')]
   me_dat = my_fe[, paste(l,'H3K4ME3')]
   
-  q_thresh = .75
+  
   ac_thresh = quantile(ac_dat, q_thresh)
   
   keep = ac_dat > ac_thresh
@@ -103,50 +106,80 @@ for(l in lines){
   forePlot(ac_dat[o], mods[1])
 }
 dev.off()
-# thresh98 = apply(markData_4me3_4ac, 2, function(x)quantile(x, .98))
-# thresh75 = apply(markData_4me3_4ac, 2, function(x)quantile(x, .75))
-# pass98 = ifelse(markData_4me3_4ac, F, F)
-# for(i in 1:ncol(pass98)){
-#   pass98[,i] = markData_4me3_4ac[,i] >= thresh98[i]
-# }
-# pass75 = ifelse(markData_4me3_4ac, F, F)
-# for(i in 1:ncol(pass98)){
-#   pass75[,i] = markData_4me3_4ac[,i] >= thresh75[i]
-# }
+thresh98 = apply(my_fe, 2, function(x)quantile(x, .98))
+thresh75 = apply(my_fe, 2, function(x)quantile(x, .75))
+pass98 = ifelse(my_fe, F, F)
+for(i in 1:ncol(pass98)){
+  pass98[,i] = my_fe[,i] >= thresh98[i]
+}
+pass75 = ifelse(my_fe, F, F)
+for(i in 1:ncol(pass98)){
+  pass75[,i] = my_fe[,i] >= thresh75[i]
+}
 
-# library(limma)
-# library(venneuler)
-# #pdf('percentile venns.pdf')
-# layout(1:2)
-# vennDiagram(pass98[,1:3], names = lines, )
-# title('98th percentile, H3K4ac')
-# vennDiagram(pass75[,1:3], names = lines)
-# title('75th percentile, H3K4ac')
-# 
-# perc_vennDiagram = function(x){
-#   tmp = vennCounts(x)
-#   tmp[1,4] = 0
-#   tmp[,4] = round(tmp[,4] / sum(tmp[,4]), digits = 2)
-#   tmp[1,4] = ""
-#   vennDiagram(tmp, names = lines)
-# }
-# 
-# perc_vennDiagram(pass98[,1:3])
-# title('98th percentile, H3K4ac')
-# perc_vennDiagram(pass75[,1:3])
-# title('75th percentile, H3K4ac')
-# 
-# 
-# vennDiagram(pass98[,4:6], names = lines)
-# title('98th percentile, H3K4me3')
-# vennDiagram(pass75[,4:6], names = lines)
-# title('75th percentile, H3K4me3')
-# 
-# perc_vennDiagram(pass98[,4:6])
-# title('98th percentile, H3K4me3')
-# perc_vennDiagram(pass75[,4:6])
-# title('75th percentile, H3K4me3')
-# 
-# plot(venneuler(pass98[,4:6]))
-# plot(venneuler(pass75[,4:6]))
-# #dev.off()
+library(limma)
+library(venneuler)
+#pdf('percentile venns.pdf')
+pdf(paste('Figure_3b_ranked_venns_JB-',date2fname(),'.pdf', sep = ''))
+layout(matrix(1:4, nrow = 2))
+par(mai = c(0,0,1,0), xpd = NA)
+
+perc_vennDiagram = function(x){
+  tmp = vennCounts(x)
+  tmp[1,4] = 0
+  tmp[,4] = format(round(tmp[,4] / sum(tmp[,4]), digits = 2), nsmall = 2)
+  tmp[1,4] = ""
+  vennDiagram(tmp, names = lines)
+}
+
+perc_vennDiagram(pass98[,1:3])
+title('98th percentile, H3K4me3')
+perc_vennDiagram(pass75[,1:3])
+title('75th percentile, H3K4me3')
+
+perc_vennDiagram(pass98[,4:6])
+title('98th percentile, H3K4ac')
+perc_vennDiagram(pass75[,4:6])
+title('75th percentile, H3K4ac')
+
+vennDiagram(pass98[,1:3], names = lines, )
+title('98th percentile, H3K4me3')
+vennDiagram(pass75[,1:3], names = lines)
+title('75th percentile, H3K4me3')
+
+vennDiagram(pass98[,4:6], names = lines)
+title('98th percentile, H3K4ac')
+vennDiagram(pass75[,4:6], names = lines)
+title('75th percentile, H3K4ac')
+
+plot(venneuler(pass98[,1:3]))
+plot(venneuler(pass75[,1:3]))
+
+plot(venneuler(pass98[,4:6]))
+plot(venneuler(pass75[,4:6]))
+dev.off()
+
+#output full lists
+final = matrix('', nrow = max(colSums(pass98)), ncol = ncol(pass98))
+colnames(final) = colnames(pass98)
+for(i in 1:ncol(pass98)){
+  cname = colnames(pass98)[i]
+  keep = rownames(pass98)[pass98[,i]]
+  keep = ensg2sym[keep]
+  final[1:length(keep),i] = keep
+}
+write.table(final, file =  paste0('Figure_3b_ranked_full_lists_JB-',date2fname(), '.csv' ), sep = ',', row.names = F, col.names = T, quote = F)
+
+#output uniques
+final = matrix('', nrow = max(colSums(pass98)), ncol = ncol(pass98))
+colnames(final) = colnames(pass98)
+for(i in 1:ncol(pass98)){
+  cname = colnames(pass98)[i]
+  half = round((i + 1) / 3) - 1
+  #print(1:3 + half * 3)
+  keep = pass98[,i] & (rowSums(pass98[,(1:3 + half * 3)]) == 1)
+  kept = rownames(pass98)[keep]
+  kept = ensg2sym[kept]
+  final[1:length(kept),i] = kept
+}
+write.table(final, file =  paste0('Figure_3b_ranked_unique_lists_JB-',date2fname(), '.csv' ), sep = ',', row.names = F, col.names = T, quote = F)

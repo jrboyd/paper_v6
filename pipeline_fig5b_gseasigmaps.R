@@ -20,7 +20,7 @@ updatePassing = F
 pdfName = paste('Figure_5b_gsea_sigmaps_JB-',date2fname(),'.pdf', sep = '')
 savePlot = T
 #starting pvalue - will be reduced until multiple gsea lists pass
-pthresh = 9
+pthresh = gsea_sig_thresh
 #bg size, all detected?  all passing FE?  all genes?
 bg_size = 20000
 

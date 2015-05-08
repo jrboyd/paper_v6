@@ -14,7 +14,7 @@ load('pw_uniq2gsea_results.save')
 
 
 plot_GSEA_heatmaps = function(res){
-  pthresh = 9
+  pthresh = gsea_sig_thresh
   passing = res[[3]] > pthresh
   uniq_passing = unlist(apply(passing, 1, function(x)return(colnames(passing)[x])))
   ngsea_passing = apply(passing, 1, function(x)return(sum(x)))

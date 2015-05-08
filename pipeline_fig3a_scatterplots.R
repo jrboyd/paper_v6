@@ -4,7 +4,8 @@ if(exists('parent_dir')){
   source('init.R')
 
 d = my_fe
-keep = apply(d, 1, max) > 2
+
+keep = apply(d, 1, max) > detect_thresh
 d = d[keep,]
 fname = "scatterplots.pdf"
 pdf(paste('Figure_3a_scatterplots_JB-',date2fname(),'.pdf', sep = ''), width = 12, height = 4)
@@ -22,7 +23,10 @@ for (i in 1:3) {
     
     points(xy, pch = 16, col = rgb(0, 0, 0, 0.1), cex = 0.7)
     
-    lines(c(-1, 10), c(-1, 10), lty = 2, col = color_1slope, lwd = 5)
+    
+    lines(c(detect_thresh, detect_thresh), c(min(d), detect_thresh), col = '#cb181d', lwd = 3)
+    lines(c(min(d), detect_thresh), c(detect_thresh, detect_thresh), col = '#cb181d', lwd = 3)
+    lines(c(min(d), max(d)), c(min(d), max(d)), lty = 2, col = color_1slope, lwd = 5)
     
     fit <- glm(xy[, 2] ~ xy[, 1])
     co <- coef(fit)

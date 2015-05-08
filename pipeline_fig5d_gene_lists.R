@@ -21,7 +21,7 @@ dir.create(out_dir)
 pdfName = paste0(out_dir, '/gsea_PAIR_important_genes.pdf')
 savePlot = T
 #starting pvalue - will be reduced until multiple gsea lists pass
-pthresh = 9
+pthresh = gsea_sig_thresh
 #bg size, all detected?  all passing FE?  all genes?
 bg_size = 20000
 #gene most be present in at least this many gsea lists
@@ -46,9 +46,9 @@ get_important_genes = function(res, pdfName){
   
   
   if(savePlot) pdf(pdfName, width = 12, height = 8)
-  for(i in 1:ncol(uniquely_K4_membership)){
-    grp_pvals = pvals[,colnames(uniquely_K4_membership)[i]]
-    keep = names(grp_pvals)[grp_pvals > 9]
+  for(i in 1:ncol(uniquely_K4_membership)){#iterate unique FC groups
+    grp_pvals = pvals[,colnames(uniquely_K4_membership)[i]]#fetch pvals for that group
+    keep = names(grp_pvals)[grp_pvals > pthresh]
     gsea_membership_sig = gsea_membs[,keep, drop = F]
     keep = rowSums(gsea_membership_sig) > 0
     gsea_membership_sig = gsea_membership_sig[keep,, drop = F]
@@ -95,7 +95,7 @@ get_important_genes = function(res, pdfName){
   
   for(i in 1:ncol(uniquely_K4_membership)){
     grp_pvals = pvals[,colnames(uniquely_K4_membership)[i], drop = F]
-    keep = rownames(grp_pvals)[grp_pvals > 9]
+    keep = rownames(grp_pvals)[grp_pvals > gsea_sig_thresh]
     if(is.null(keep)){
       next
     }
@@ -106,7 +106,7 @@ get_important_genes = function(res, pdfName){
     uniq_members = rownames(uniq_in_gsea_sig)[uniq_in_gsea_sig[,i]]
     output[i] = paste(uniq_members, collapse = ',')
     
-    keep = rownames(grp_pvals)[grp_pvals > 9]
+    keep = rownames(grp_pvals)[grp_pvals > gsea_sig_thresh]
     gsea_membership_sig = gsea_membs[,keep, drop = F]
     keep = rowSums(gsea_membership_sig) > 1
     gsea_membership_sig = gsea_membership_sig[keep,, drop = F]
@@ -125,3 +125,47 @@ get_important_genes = function(res, pdfName){
 a = get_important_genes(res_10a_v_7, sub('PAIR', '10a_v_7', pdfName))
 b = get_important_genes(res_10a_v_231, sub('PAIR', '10a_v_231', pdfName))
 c = get_important_genes(res_7_v_231, sub('PAIR', '7_v_231', pdfName))
+
+
+
+get_genes_passing = function(res, res_name){
+  pvals = res[[3]]
+  uniq_membership = res[[2]]
+  gsea_lists = res[[1]]
+  gsea_passing = character()
+  uniq_passing = character()
+  for(i in 1:ncol(uniq_membership)){#iterate unique FC groups
+    grp_pvals = pvals[,colnames(uniq_membership)[i]]#fetch pvals for that group
+    keep = grp_pvals > pthresh
+    kept = names(grp_pvals)[keep]
+    #print(kept)
+    gsea_passing = c(gsea_passing, kept)
+    uniq_name = colnames(uniq_membership)[i]
+    uniq_passing = c(uniq_passing, rep(uniq_name, length(kept)))
+  }
+  genes_passing = list()
+  for(i in 1:length(gsea_passing)){
+    g = gsea_passing[i]
+    u = uniq_passing[i]
+    keep = gsea_membership[,g]
+    in_gsea = names(keep)[keep]
+    keep = uniq_membership[,u]
+    in_uniq = names(keep)[keep]
+    in_sig = intersect(in_gsea, in_uniq)
+    genes_passing[[length(genes_passing) + 1]] = in_sig
+  }
+  final = matrix('', nrow  = max(sapply(genes_passing, length)), ncol = length(genes_passing))
+  for(i in 1:ncol(final)){
+    final[1:length(genes_passing[[i]]),i] = genes_passing[[i]]
+  }
+  final = rbind(uniq_passing, gsea_passing, final)
+  write.table(final, paste0(res_name, '.csv'), sep = ',', row.names = F, col.names = F, quote = F)
+  return(final)
+}
+list_dir = paste0('Figure_5d_gene_lists_JB-', date2fname())
+dir.create(list_dir)
+setwd(list_dir)
+a = get_genes_passing(res_10a_v_231, 'MCF10A vs MDA231')
+b = get_genes_passing(res_10a_v_7, 'MCF10A vs MCF7')
+c = get_genes_passing(res_7_v_231, 'MCF7 vs MDA231')
+setwd('..')
