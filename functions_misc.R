@@ -1,7 +1,9 @@
 sym2dat = function(sym){
-  ensg = names(ensg2sym)[ensg2sym == sym]
+  ensg = sapply(sym, function(x){
+    return(names(ensg2sym)[ensg2sym == x])
+  })
   print(my_fe[ensg,])
-  print(mycounts[ensg,])
+  #print(mycounts[ensg,])
   return(my_fe[ensg,])
 }
 
