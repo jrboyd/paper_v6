@@ -159,27 +159,48 @@ plot(venneuler(pass98[,4:6]))
 plot(venneuler(pass75[,4:6]))
 dev.off()
 
-#output full lists
+#output full lists of genes in top 2%
 final = matrix('', nrow = max(colSums(pass98)), ncol = ncol(pass98))
 colnames(final) = colnames(pass98)
 for(i in 1:ncol(pass98)){
   cname = colnames(pass98)[i]
-  keep = rownames(pass98)[pass98[,i]]
-  keep = ensg2sym[keep]
-  final[1:length(keep),i] = keep
+  keep = pass98[,i]
+  vals = sort(my_fe[keep,i], decreasing = T)
+  final[1:length(vals),i] = ensg2sym[names(vals)]
 }
 write.table(final, file =  paste0('Figure_3b_ranked_full_lists_JB-',date2fname(), '.csv' ), sep = ',', row.names = F, col.names = T, quote = F)
 
 #output uniques
-final = matrix('', nrow = max(colSums(pass98)), ncol = ncol(pass98))
-colnames(final) = colnames(pass98)
-for(i in 1:ncol(pass98)){
-  cname = colnames(pass98)[i]
-  half = round((i + 1) / 3) - 1
-  #print(1:3 + half * 3)
-  keep = pass98[,i] & (rowSums(pass98[,(1:3 + half * 3)]) == 1)
-  kept = rownames(pass98)[keep]
-  kept = ensg2sym[kept]
-  final[1:length(kept),i] = kept
+final_uniq = matrix('', nrow = nrow(final), ncol = 1.5 * ncol(final))
+
+layout(1:3)
+rng = 1:3
+for(i in rng){#TERRIBLE CODE, write lists for mark overlaps
+  tmp_me = final[,i]
+  tmp_ac = final[,i+3]
+  tmp_all = union(tmp_me, tmp_ac)
+  membs = matrix(F, ncol = 2, nrow = length(tmp_all))
+  rownames(membs) = tmp_all
+  membs[tmp_me,1] = T
+  membs[tmp_ac,2] = T
+  vennDiagram(membs)
+  me_only = rownames(membs)[membs[,1] & !membs[,2]]
+  ac_only = rownames(membs)[!membs[,1] & membs[,2]]
+  both = rownames(membs)[membs[,1] & membs[,2]]
+  
+  final_uniq[1:length(me_only),1+(i-1)*3] = me_only
+  final_uniq[1:length(both),2+(i-1)*3] = both
+  final_uniq[1:length(ac_only),3+(i-1)*3] = ac_only
+  
+#   is_uniq = rep(T, length(tmp))
+#   for(j in 1:length(tmp)){
+#     if(sum(tmp[j] == final[,rng]) > 1){
+#       is_uniq[j] = F
+#     }
+#   }
+#   kept = tmp[is_uniq]
+#   final_uniq[1:length(kept),i] = kept
 }
-write.table(final, file =  paste0('Figure_3b_ranked_unique_lists_JB-',date2fname(), '.csv' ), sep = ',', row.names = F, col.names = T, quote = F)
+
+colnames(final_uniq) = unlist(lapply(lines, function(x)paste(x, c('H3K4me3 only', 'both', 'H3K4AC only'))))
+write.table(final_uniq, file =  paste0('Figure_3b_ranked_unique_lists_JB-',date2fname(), '.csv' ), sep = ',', row.names = F, col.names = T, quote = F)
