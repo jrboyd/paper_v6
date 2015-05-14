@@ -1,6 +1,8 @@
 
 
 mycounts = countDir.read(in_parent_dir('counts_mine/'))
+is_protein_coding = ensg2type[rownames(mycounts)] == 'protein_coding'
+mycounts = mycounts[is_protein_coding,]
 tmp = read.table(in_parent_dir('million_mapped_reads.txt'), stringsAsFactors = F)
 mm_reads = tmp[,2]
 names(mm_reads) = sapply(strsplit(tmp[,1], '_'), function(x)return(paste(x[1:3], collapse = ' ')))
