@@ -15,7 +15,6 @@ reps = tmp[3,]
 colnames(mycounts) = paste(cell_lines, histone_mods, reps)
 
 mycpm = mycounts
-
 for(cn in colnames(mycpm)){
   mycpm[,cn] = mycpm[,cn] / mm_reads[cn]
 }

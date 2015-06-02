@@ -6,7 +6,7 @@ if(exists('parent_dir')){
   source('init.R')
 
 markData_4me3_4ac = my_fe
-keep = apply(markData_4me3_4ac, 1, max) > 2
+keep = apply(markData_4me3_4ac, 1, max) > detect_thresh
 markData_4me3_4ac = markData_4me3_4ac[keep,]
 
 lines = c('MCF10A', 'MCF7', 'MDA231')

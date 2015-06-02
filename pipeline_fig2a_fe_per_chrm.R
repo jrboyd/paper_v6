@@ -47,10 +47,10 @@ matrix2data.frame = function(mat){
   i = unlist(lapply(1:nrow(mat), function(x)rep(x, ncol(mat))))#appends each row into single vector
   
   is_diff = rep('other', length(i))
-  is_diff[chrms == '16'] = 'chr16'
-  is_diff[chrms == '17'] = 'chr17'
+  is_diff[chrms == 'X'] = 'chrX'
+  is_diff[chrms == '13'] = 'chr13'
   is_diff[chrms == '19'] = 'chr19'
-  is_diff[chrms == '20'] = 'chr20'
+  is_diff[chrms == '17'] = 'chr17'
   is_diff[chrms == '22'] = 'chr22'
   
   cl = jrb.split_colnames(t(mat), split = ' ')[1,]

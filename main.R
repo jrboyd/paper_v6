@@ -10,7 +10,7 @@ if(exists('parent_dir')){
 }
 setwd('..')
 
-for(f in dir(pattern = 'pipeline_fig.+\\.R')){
+for(f in dir(pattern = '^pipeline_fig.+\\.R')){
   print(f)
   source(in_parent_dir(f))
 }

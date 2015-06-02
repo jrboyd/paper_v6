@@ -97,7 +97,7 @@ plot_uniquely = function(uniquely_K4_membership, pairName = 'A to B'){
   colors = cr(x = (0:13^2)^.5/10 - .3)
   colors = ifelse(is.na(colors), 255, colors)
   colors = rgb(colors / 255)
-  byChance = round(lsize * 10^-pthresh * 3, 2) * 9
+  byChance = round(lsize * 6 * 10^-pthresh, 2) 
   title = paste(
     pairName,
     '\n', sum(keep), ' of ', lsize, ' lists pass 10^-', pthresh, 
@@ -131,7 +131,7 @@ plot_uniquely = function(uniquely_K4_membership, pairName = 'A to B'){
     Colv = NA,
     Rowv = NA,
     margins = c(8,20),
-    cexRow = 1, cexCol = 1.4,
+    cexRow = .5, cexCol = .6,
     trace = 'n',
     col = colors,
     colsep = c(3,6),

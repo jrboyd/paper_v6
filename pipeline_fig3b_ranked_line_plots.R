@@ -70,7 +70,7 @@ bgPlot = function(x, m){
   #print(ensg2sym[top])
 }
 par(mai = rep(0,4))
-textPlot(paste('Highly methylated promoters are acetylated.\nHighly acetylated promoters are not necessarily methylated.'))
+textPlot(paste('The most highly methylated promoters are also highly acetylated.\nThe most highly acetylated promoters are not necessarily as highly methylated.'))
 for(m in mods){
   textPlot(paste(m, 'over 75th percentile sorted by', m,'\n',other_mod(m),'in background'))
 }
@@ -202,5 +202,5 @@ for(i in rng){#TERRIBLE CODE, write lists for mark overlaps
 #   final_uniq[1:length(kept),i] = kept
 }
 
-colnames(final_uniq) = unlist(lapply(lines, function(x)paste(x, c('H3K4me3 only', 'both', 'H3K4AC only'))))
+colnames(final_uniq) = unlist(lapply(lines, function(x)paste(x, c('H3K4me3 top 2%', 'both top 2%', 'H3K4AC top 2%'))))
 write.table(final_uniq, file =  paste0('Figure_3b_ranked_unique_lists_JB-',date2fname(), '.csv' ), sep = ',', row.names = F, col.names = T, quote = F)
