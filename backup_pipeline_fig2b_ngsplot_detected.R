@@ -32,7 +32,23 @@ applyWindow = function(dat, win = 10){
   return(out)
 }
 #pdf('ngs_custom.pdf')
-
+if(!exists('all_profiles')){
+  all_profiles = list()
+  for(n in sub(' ', '_', colnames(markData_4me3_4ac))){
+    
+    in_dir = dir(in_parent_dir('ngsplot_data'), full.names = T, pattern = n)
+    
+    fname = paste(in_dir, '/hm1.txt', sep = "")
+    
+    tmp = read.table(fname, stringsAsFactors = F)
+    ensgs = tmp[2:nrow(tmp),1]
+    strand = tmp[2:nrow(tmp),4]
+    dat = as.matrix(tmp[2:nrow(tmp), 5:ncol(tmp)])
+    rownames(dat) = ensgs
+    dat = dat[intersect(rownames(dat), ensg2cut[rownames(markData_4me3_4ac)]),]
+    all_profiles[[n]] = dat
+  }
+}
 
 me3_i = 1:3
 ac_i = 4:6

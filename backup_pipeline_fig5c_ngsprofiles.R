@@ -22,9 +22,9 @@ me_dat[['MCF7']] = all_profiles[['MCF7_H3K4ME3']]
 me_dat[['MDA231']] = all_profiles[['MDA231_H3K4ME3']]
 
 out_dir = paste('Figure_5c_gsea_ngsplots_JB-',date2fname(),sep = '')
-a = ngsplot_passing(res_10a_v_231, 'MCF10A', 'MDA231', outdir_name = out_dir, pthresh = gsea_sig_thresh)
-b = ngsplot_passing(res_10a_v_7, 'MCF10A', 'MCF7', outdir_name = out_dir, pthresh = gsea_sig_thresh)
-c = ngsplot_passing(res_7_v_231, 'MCF7', 'MDA231', outdir_name = out_dir, pthresh = gsea_sig_thresh)
+a = ngsplot_passing(res_10a_v_231, 'MCF10A', 'MDA231', outdir_name = out_dir)
+b = ngsplot_passing(res_10a_v_7, 'MCF10A', 'MCF7', outdir_name = out_dir)
+c = ngsplot_passing(res_7_v_231, 'MCF7', 'MDA231', outdir_name = out_dir)
 # 
 # abc = union(union(a, b), c)
 # 
